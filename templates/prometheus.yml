@@ -1,0 +1,83 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alertmanager:9093"
+      scheme: http
+      timeout: 10s
+
+scrape_configs:
+  - job_name: 'node'
+    static_configs:
+{% for host in groups.monitoring_target %}
+      - targets: ['{{ hostvars[host].ansible_host }}:{{ server_node_exporter_port }}']
+        labels: {'host': '{{ host }}'}
+{% endfor %}
+
+  - job_name: 'blackbox-http-get'
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [http_get_2xx]
+    static_configs:
+      - targets: {{ prometheus_blackbox_http_get_targets }}
+    relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  - job_name: 'blackbox-http-head'
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [http_head_2xx]
+    static_configs:
+      - targets: {{ prometheus_blackbox_http_head_targets }}
+    relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  - job_name: 'blackbox-mastodon-instance-info'
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [mastodon_instance_info]
+    static_configs:
+      - targets: {{ prometheus_blackbox_mastodon_instance_info_targets }}
+    relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+  - job_name: 'blackbox-mastodon-well-known-host-meta'
+    scrape_interval: 60s
+    metrics_path: /probe
+    params:
+      module: [mastodon_well_known_host_meta]
+    static_configs:
+      - targets: {{ prometheus_blackbox_mastodon_well_known_host_meta_targets }}
+    relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115
+
+rule_files:
+  - alerts.yml

@@ -1,0 +1,82 @@
+- name: Create config directory
+  file:
+    path: "{{ prometheus_config_dir }}"
+    state: directory
+    mode: 0700
+
+- name: Create docker network
+  docker_network:
+    name: prometheus
+
+- name: Copy alerts config
+  template:
+    src: alerts.yml
+    dest: "{{ prometheus_config_dir }}/alerts.yml"
+    mode: 0644
+  register: _alerts_config
+
+- name: Copy Prometheus config
+  template:
+    src: prometheus.yml
+    dest: "{{ prometheus_config_dir }}/prometheus.yml"
+    mode: 0644
+  register: _prometheus_config
+
+# - name: Create _prometheus_etc_hosts dict
+#   set_fact:
+#     _prometheus_etc_hosts: "{{ _prometheus_etc_hosts | default({}) | combine({item: hostvars[item].private_network_ip}) }}"
+#   when: hostvars[item].private_network_ip is defined
+#   with_items: "{{ groups.all }}"
+
+- name: Start Prometheus container
+  docker_container:
+    name: prometheus
+    image: "{{ prometheus_docker_image }}"
+    hostname: "{{ prometheus_hostname }}"
+    entrypoint:
+      - "/bin/prometheus"
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      # Everything above this line is copied from the prometheus Dockerfile ENTRYPOINT. We need to duplicate this if we want to add any arguments.
+      # Cf. https://github.com/prometheus/prometheus/issues/3385
+      # Custom arguments:
+      - "--web.external-url={{ prometheus_web_external_url }}"
+    # etc_hosts: "{{ _prometheus_etc_hosts }}"
+    volumes:
+      - "{{ prometheus_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "{{prometheus_config_dir }}/alerts.yml:/etc/prometheus/alerts.yml"
+    restart_policy: unless-stopped
+    restart: "{{ (_prometheus_config is defined and _prometheus_config.changed) or (_alerts_config is defined and _alerts_config.changed) }}"
+    networks:
+      - name: prometheus
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prometheus.rule: "{{ prometheus_traefik_router_rule }}"
+      traefik.http.routers.prometheus.entrypoints: "websecure"
+      traefik.http.routers.prometheus.tls.certresolver: "letsencrypt"
+      traefik.http.routers.prometheus.middlewares: "prometheusauth"
+      traefik.http.services.prometheus.loadbalancer.server.port: "9090"
+      traefik.http.middlewares.prometheusauth.basicauth.users: "{{ prometheus_basic_auth }}"
+      traefik.docker.network: prometheus
+
+- name: Copy Blackbox config
+  template:
+    src: blackbox.yml
+    dest: "{{ prometheus_config_dir }}/blackbox.yml"
+    mode: 0644
+  register: _blackbox_config
+
+- name: Start Blackbox container
+  docker_container:
+    name: blackbox
+    image: "{{ prometheus_blackbox_exporter_docker_image }}"
+    # ports:
+    #   - "9115"
+    volumes:
+      - "{{ prometheus_config_dir }}/blackbox.yml:/etc/blackbox_exporter/config.yml"
+    restart_policy: unless-stopped
+    restart: "{{ _blackbox_config is defined and _blackbox_config.changed }}"
+    networks:
+      - name: prometheus
