@@ -34,7 +34,7 @@ modules:
       fail_if_not_ssl: true
       preferred_ip_protocol: "ip4"
       ip_protocol_fallback: false
-      fail_if_body_not_matches_regexp: {{ prometheus_blackbox_mastodon_instance_info_regexp }}
+      fail_if_body_not_matches_regexp: {{ prometheus_blackbox_mastodon_instance_info_regexp | to_yaml }}
 
   mastodon_well_known_host_meta:
     prober: http
@@ -44,4 +44,4 @@ modules:
       fail_if_not_ssl: true
       preferred_ip_protocol: "ip4"
       ip_protocol_fallback: false
-      fail_if_body_not_matches_regexp: {{ prometheus_blackbox_mastodon_well_known_host_meta_regexp }}
+      fail_if_body_not_matches_regexp: {{ prometheus_blackbox_mastodon_well_known_host_meta_regexp | to_yaml }}
