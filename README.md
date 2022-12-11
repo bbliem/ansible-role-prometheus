@@ -17,6 +17,10 @@ Ansible role for installing Prometheus
 - `prometheus_traefik_router_rule` [default: `Host(``{{ prometheus_hostname }}``)`]
 - `prometheus_basic_auth` [required]
 
+### Node exporter
+
+- `prometheus_node_static_configs` [required]
+
 ### Blackbox exporter
 - `prometheus_blackbox_http_get_targets` [required]
 - `prometheus_blackbox_http_head_targets` [required]

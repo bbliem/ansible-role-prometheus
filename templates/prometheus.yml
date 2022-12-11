@@ -13,11 +13,7 @@ alerting:
 
 scrape_configs:
   - job_name: 'node'
-    static_configs:
-{% for host in groups.monitoring_target %}
-      - targets: ['{{ hostvars[host].ansible_host }}:{{ server_node_exporter_port }}']
-        labels: {'host': '{{ host }}'}
-{% endfor %}
+    static_configs: {{ prometheus_node_static_configs }}
 
   - job_name: 'blackbox-http-get'
     scrape_interval: 60s
