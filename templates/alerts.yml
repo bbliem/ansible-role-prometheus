@@ -539,13 +539,13 @@ groups:
       description: "Probe failed\n  VALUE = {{ "{{ $value }}" }}\n  LABELS = {{ "{{ $labels }}" }}"
 
   - alert: BlackboxSlowProbe
-    expr: avg_over_time(probe_duration_seconds[3m]) > 3
+    expr: avg_over_time(probe_duration_seconds[3m]) > 5
     for: 3m
     labels:
       severity: warning
     annotations:
       summary: "Blackbox slow probe (instance {{ "{{ $labels.instance }}" }})"
-      description: "Blackbox probe took more than 3s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
+      description: "Blackbox probe took more than 5s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
   - alert: BlackboxProbeHttpFailure
     expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
