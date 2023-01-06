@@ -13,7 +13,8 @@ alerting:
 
 scrape_configs:
   - job_name: 'node'
-    static_configs: {{ prometheus_node_static_configs | to_yaml }}
+    static_configs:
+      {{ prometheus_node_static_configs | to_nice_yaml(indent=2) | indent(6) }}
 
   - job_name: 'blackbox-http-get'
     scrape_interval: 60s
@@ -21,7 +22,8 @@ scrape_configs:
     params:
       module: [http_get_2xx]
     static_configs:
-      - targets: {{ prometheus_blackbox_http_get_targets | to_yaml }}
+      - targets:
+        {{ prometheus_blackbox_http_get_targets | to_nice_yaml(indent=2) | indent(8) }}
     relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
       - source_labels: [__address__]
         target_label: __param_target
@@ -36,7 +38,8 @@ scrape_configs:
     params:
       module: [http_head_2xx]
     static_configs:
-      - targets: {{ prometheus_blackbox_http_head_targets | to_yaml }}
+      - targets:
+        {{ prometheus_blackbox_http_head_targets | to_nice_yaml(indent=2) | indent(8) }}
     relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
       - source_labels: [__address__]
         target_label: __param_target
@@ -51,7 +54,8 @@ scrape_configs:
     params:
       module: [mastodon_instance_info]
     static_configs:
-      - targets: {{ prometheus_blackbox_mastodon_instance_info_targets | to_yaml }}
+      - targets:
+        {{ prometheus_blackbox_mastodon_instance_info_targets | to_nice_yaml(indent=2) | indent(8) }}
     relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
       - source_labels: [__address__]
         target_label: __param_target
@@ -66,7 +70,8 @@ scrape_configs:
     params:
       module: [mastodon_well_known_host_meta]
     static_configs:
-      - targets: {{ prometheus_blackbox_mastodon_well_known_host_meta_targets | to_yaml }}
+      - targets:
+        {{ prometheus_blackbox_mastodon_well_known_host_meta_targets | to_nice_yaml(indent=2) | indent(8) }}
     relabel_configs: # to understand this, read https://prometheus.io/docs/guides/multi-target-exporter/
       - source_labels: [__address__]
         target_label: __param_target
