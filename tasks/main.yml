@@ -1,35 +1,35 @@
 - name: Create config directory
-  file:
+  ansible.builtin.file:
     path: "{{ prometheus_config_dir }}"
     state: directory
     mode: 0700
 
 - name: Create docker network
-  docker_network:
+  community.docker.docker_network:
     name: prometheus
 
 - name: Copy alerts config
-  template:
+  ansible.builtin.template:
     src: alerts.yml
     dest: "{{ prometheus_config_dir }}/alerts.yml"
     mode: 0644
   register: _alerts_config
 
 - name: Copy Prometheus config
-  template:
+  ansible.builtin.template:
     src: prometheus.yml
     dest: "{{ prometheus_config_dir }}/prometheus.yml"
     mode: 0644
   register: _prometheus_config
 
 # - name: Create _prometheus_etc_hosts dict
-#   set_fact:
+#   ansible.builtin.set_fact:
 #     _prometheus_etc_hosts: "{{ _prometheus_etc_hosts | default({}) | combine({item: hostvars[item].private_network_ip}) }}"
 #   when: hostvars[item].private_network_ip is defined
 #   with_items: "{{ groups.all }}"
 
 - name: Start Prometheus container
-  docker_container:
+  community.docker.docker_container:
     name: prometheus
     image: "{{ prometheus_docker_image }}"
     hostname: "{{ prometheus_hostname }}"
@@ -46,7 +46,7 @@
     # etc_hosts: "{{ _prometheus_etc_hosts }}"
     volumes:
       - "{{ prometheus_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
-      - "{{prometheus_config_dir }}/alerts.yml:/etc/prometheus/alerts.yml"
+      - "{{ prometheus_config_dir }}/alerts.yml:/etc/prometheus/alerts.yml"
     restart_policy: unless-stopped
     restart: "{{ (_prometheus_config is defined and _prometheus_config.changed) or (_alerts_config is defined and _alerts_config.changed) }}"
     networks:
@@ -62,14 +62,14 @@
       traefik.docker.network: prometheus
 
 - name: Copy Blackbox config
-  template:
+  ansible.builtin.template:
     src: blackbox.yml
     dest: "{{ prometheus_config_dir }}/blackbox.yml"
     mode: 0644
   register: _blackbox_config
 
 - name: Start Blackbox container
-  docker_container:
+  community.docker.docker_container:
     name: blackbox
     image: "{{ prometheus_blackbox_exporter_docker_image }}"
     # ports:
