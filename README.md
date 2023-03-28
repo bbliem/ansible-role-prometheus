@@ -6,8 +6,8 @@ Ansible role for installing Prometheus
 
 ### Docker
 
-- `prometheus_docker_image` [default: `prom/prometheus:v2.37.2`]
-- `prometheus_blackbox_exporter_docker_image` [default: `prom/blackbox-exporter:v0.22.0`]
+- `prometheus_docker_image` [default: `prom/prometheus:v2.43.0`]
+- `prometheus_blackbox_exporter_docker_image` [default: `prom/blackbox-exporter:v0.23.0`]
 
 ### General
 
