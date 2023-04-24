@@ -531,7 +531,7 @@ groups:
   rules:
   - alert: BlackboxProbeFailed
     expr: probe_success == 0
-    for: 2m
+    for: 4m
     labels:
       severity: error
     annotations:
@@ -539,8 +539,8 @@ groups:
       description: "Probe failed\n  VALUE = {{ "{{ $value }}" }}\n  LABELS = {{ "{{ $labels }}" }}"
 
   - alert: BlackboxSlowProbe
-    expr: avg_over_time(probe_duration_seconds[3m]) > 5
-    for: 3m
+    expr: avg_over_time(probe_duration_seconds[5m]) > 5
+    for: 5m
     labels:
       severity: warning
     annotations:
@@ -549,7 +549,7 @@ groups:
 
   - alert: BlackboxProbeHttpFailure
     expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
-    for: 2m
+    for: 4m
     labels:
       severity: error
     annotations:
@@ -581,8 +581,8 @@ groups:
       description: "SSL certificate has expired already\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
   - alert: BlackboxProbeSlowHttp
-    expr: avg_over_time(probe_http_duration_seconds[3m]) > 2
-    for: 3m
+    expr: avg_over_time(probe_http_duration_seconds[5m]) > 2
+    for: 5m
     labels:
       severity: warning
     annotations:
