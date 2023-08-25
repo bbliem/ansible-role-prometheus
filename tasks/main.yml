@@ -44,12 +44,13 @@
       # Custom arguments:
       - "--web.external-url={{ prometheus_web_external_url }}"
     # etc_hosts: "{{ _prometheus_etc_hosts }}"
-    volumes:
-      - "{{ prometheus_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
-      - "{{ prometheus_config_dir }}/alerts.yml:/etc/prometheus/alerts.yml"
     etc_hosts:
       # Expose host IP to container by putting host.docker.internal into /etc/hosts (requires Docker 20.10 or newer)
       host.docker.internal: host-gateway
+    volumes:
+      - "{{ prometheus_config_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "{{ prometheus_config_dir }}/alerts.yml:/etc/prometheus/alerts.yml"
+      - "{{ prometheus_data_volume }}:/prometheus"
     restart_policy: unless-stopped
     restart: "{{ (_prometheus_config is defined and _prometheus_config.changed) or (_alerts_config is defined and _alerts_config.changed) }}"
     networks:
