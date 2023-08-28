@@ -119,14 +119,14 @@ groups:
       summary: "Host unusual disk write latency (instance {{ "{{$labels.instance }}" }})"
       description: "Disk latency is growing (write operations > 100ms)\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
 
-  - alert: HostHighCpuLoad
-    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[10m])) * 100) > 80
-    for: 10m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Host high CPU load (instance {{ "{{$labels.instance }}" }})"
-      description: "CPU load is > 80%\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
+  # - alert: HostHighCpuLoad
+  #   expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[10m])) * 100) > 80
+  #   for: 10m
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Host high CPU load (instance {{ "{{$labels.instance }}" }})"
+  #     description: "CPU load is > 80%\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
 
   - alert: HostSwapIsFillingUp
     expr: (1 - (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes)) * 100 > 80
@@ -539,13 +539,13 @@ groups:
       description: "Probe failed\n  VALUE = {{ "{{ $value }}" }}\n  LABELS = {{ "{{ $labels }}" }}"
 
   - alert: BlackboxSlowProbe
-    expr: avg_over_time(probe_duration_seconds[5m]) > 5
+    expr: quantile_over_time(0.8, probe_duration_seconds[5m]) > 5
     for: 5m
     labels:
       severity: warning
     annotations:
       summary: "Blackbox slow probe (instance {{ "{{ $labels.instance }}" }})"
-      description: "Blackbox probe took more than 5s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
+      description: "20 % of blackbox probes took more than 5s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
   - alert: BlackboxProbeHttpFailure
     expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
@@ -581,10 +581,10 @@ groups:
       description: "SSL certificate has expired already\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
   - alert: BlackboxProbeSlowHttp
-    expr: avg_over_time(probe_http_duration_seconds[5m]) > 2
+    expr: quantile_over_time(0.8, probe_http_duration_seconds[5m]) > 2
     for: 5m
     labels:
       severity: warning
     annotations:
       summary: "Blackbox probe slow HTTP (instance {{ "{{ $labels.instance }}" }})"
-      description: "HTTP request took more than 2s\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
+      description: "20 % of HTTP requests took more than 2s\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
