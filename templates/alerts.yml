@@ -580,11 +580,11 @@ groups:
       summary: "Blackbox SSL certificate expired (instance {{ "{{ $labels.instance }}" }})"
       description: "SSL certificate has expired already\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
-  - alert: BlackboxProbeSlowHttp
-    expr: quantile_over_time(0.8, probe_http_duration_seconds[5m]) > 2
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Blackbox probe slow HTTP (instance {{ "{{ $labels.instance }}" }})"
-      description: "20 % of HTTP requests took more than 2s\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
+  # - alert: BlackboxProbeSlowHttp
+  #   expr: quantile_over_time(0.8, probe_http_duration_seconds[5m]) > 2
+  #   for: 5m
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Blackbox probe slow HTTP (instance {{ "{{ $labels.instance }}" }})"
+  #     description: "20 % of HTTP requests took more than 2s\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
