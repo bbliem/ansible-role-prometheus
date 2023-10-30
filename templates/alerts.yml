@@ -538,14 +538,14 @@ groups:
       summary: Blackbox probe failed (instance {{ "{{ $labels.instance }}" }})
       description: "Probe failed\n  VALUE = {{ "{{ $value }}" }}\n  LABELS = {{ "{{ $labels }}" }}"
 
-  - alert: BlackboxSlowProbe
-    expr: quantile_over_time(0.8, probe_duration_seconds[5m]) > 5
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Blackbox slow probe (instance {{ "{{ $labels.instance }}" }})"
-      description: "20 % of blackbox probes took more than 5s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
+  # - alert: BlackboxSlowProbe
+  #   expr: quantile_over_time(0.8, probe_duration_seconds[5m]) > 5
+  #   for: 5m
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Blackbox slow probe (instance {{ "{{ $labels.instance }}" }})"
+  #     description: "20 % of blackbox probes took more than 5s to complete\n  VALUE = {{ "{{ $value }}" }}\n  LABELS: {{ "{{ $labels }}" }}"
 
   - alert: BlackboxProbeHttpFailure
     expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
