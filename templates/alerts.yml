@@ -65,14 +65,14 @@ groups:
       summary: "Host root out of disk space (instance {{ "{{$labels.instance }}" }})"
       description: "Disk at / is almost full (< 5% left)\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
 
-  - alert: HostDiskWillFillIn4Hours
-    expr: predict_linear(node_filesystem_free_bytes{fstype!~"tmpfs"}[1h], 4 * 3600) < 0
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Host disk will fill in 4 hours (instance {{ "{{$labels.instance }}" }})"
-      description: "Disk will fill in 4 hours at current write rate\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
+  # - alert: HostDiskWillFillIn4Hours
+  #   expr: predict_linear(node_filesystem_free_bytes{fstype!~"tmpfs"}[1h], 4 * 3600) < 0
+  #   for: 5m
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Host disk will fill in 4 hours (instance {{ "{{$labels.instance }}" }})"
+  #     description: "Disk will fill in 4 hours at current write rate\n  VALUE = {{ "{{$value }}" }}\n  LABELS: {{ "{{$labels }}" }}"
 
   # - alert: HostDiskWillFillIn4Days
   #   expr: quantile_over_time(0.9, (-node_filesystem_avail_bytes{fstype!~'tmpfs', mountpoint!~'/boot/efi'}/deriv(node_filesystem_avail_bytes{fstype!~'tmpfs',mountpoint!~'/boot/efi'}[30m]))[4h:])/(60*60*24) < 4
